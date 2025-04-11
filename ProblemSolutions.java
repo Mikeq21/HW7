@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Michael Quiroga / 272-001
  *
  *   This java file contains the problem solutions for the methods selectionSort,
  *   mergeSortDivisibleByKFirst, asteroidsDestroyed, and numRescueCanoes methods.
@@ -13,37 +13,39 @@ public class ProblemSolutions {
 
     /**
      * Method SelectionSort
-     *
+     * <p>
      * This method performs a selection sort. This file will be spot checked,
      * so ENSURE you are performing a Selection Sort!
-     *
+     * <p>
      * This is an in-place sorting operation that has two function signatures. This
      * allows the second parameter to be optional, and if not provided, defaults to an
      * ascending sort. If the second parameter is provided and is false, a descending
      * sort is performed.
      *
-     * @param values        - int[] array to be sorted.
-     * @param ascending     - if true,method performs an ascending sort, else descending.
-     *                        There are two method signatures allowing this parameter
-     *                        to not be passed and defaulting to 'true (or ascending sort).
+     * @param values    - int[] array to be sorted.
+     * @param ascending - if true,method performs an ascending sort, else descending.
+     *                  There are two method signatures allowing this parameter
+     *                  to not be passed and defaulting to 'true (or ascending sort).
      */
 
-    public  void selectionSort(int[] values) {
+    public void selectionSort(int[] values) {
         selectionSort(values, true);
     }
 
-    public static void selectionSort(int[] values, boolean ascending ) {
-
-        int n = values.length;
-
-        for (int i = 0; i < n - 1; i++) {
-
-            // YOU CODE GOES HERE -- COMPLETE THE INNER LOOP OF THIS
-            // "SELECTION SORT" ALGORITHM.
-            // DO NOT FORGET TO ADD YOUR NAME / SECTION ABOVE
-
+    public static void selectionSort(int[] values, boolean ascending) {
+        for (int i = 0; i < values.length - 1; i++) {
+            int selectedIndex = i;
+            for (int j = i + 1; j < values.length; j++) {
+                if ((ascending && values[j] < values[selectedIndex]) ||
+                        (!ascending && values[j] > values[selectedIndex])) {
+                        selectedIndex = j;
+                }
+            }
+            // Swap values[i] and values[selectedIndex]
+            int temp = values[i];
+            values[i] = values[selectedIndex];
+            values[selectedIndex] = temp;
         }
-
     } // End class selectionSort
 
 
@@ -90,21 +92,44 @@ public class ProblemSolutions {
      * The merging portion of the merge sort, divisible by k first
      */
 
-    private void mergeDivisbleByKFirst(int arr[], int k, int left, int mid, int right)
-    {
-        // YOUR CODE GOES HERE, THIS METHOD IS NO MORE THAN THE STANDARD MERGE PORTION
-        // OF A MERGESORT, EXCEPT THE NUMBERS DIVISIBLE BY K MUST GO FIRST WITHIN THE
-        // SEQUENCE PER THE DISCUSSION IN THE PROLOGUE ABOVE.
-        //
-        // NOTE: YOU CAN PROGRAM THIS WITH A SPACE COMPLEXITY OF O(1) OR O(N LOG N).
-        // AGAIN, THIS IS REFERRING TO SPACE COMPLEXITY. O(1) IS IN-PLACE, O(N LOG N)
-        // ALLOCATES AUXILIARY DATA STRUCTURES (TEMPORARY ARRAYS). IT WILL BE EASIER
-        // TO CODE WITH A SPACE COMPLEXITY OF O(N LOG N), WHICH IS FINE FOR PURPOSES
-        // OF THIS PROGRAMMING EXERCISES.
+    private void mergeDivisbleByKFirst(int arr[], int k, int left, int mid, int right) {
+        // Cant figure this one out D:
+        int[] temp = new int[right - left + 1];
+        int i = left, j = mid + 1, t = 0;
 
-        return;
+        // Merge using standard merge but with custom comparator
+        while (i <= mid && j <= right) {
+            boolean iDiv = arr[i] % k == 0;
+            boolean jDiv = arr[j] % k == 0;
 
+            if (iDiv && !jDiv) {
+                temp[t++] = arr[i++];
+            } else if (!iDiv && jDiv) {
+                temp[t++] = arr[j++];
+            } else {
+                if (iDiv && jDiv) { // If both are divisible by k, prioritize descending order
+                    if (arr[i] > arr[j]) {  // Change the condition to descending order
+                        temp[t++] = arr[i++];
+                    } else {
+                        temp[t++] = arr[j++];
+                    }
+                } else {
+                    temp[t++] = arr[j++];
+                }
+            }
+        }
+
+        while (i <= mid) {
+            temp[t++] = arr[i++];
+        }
+
+        while (j <= right) {
+            temp[t++] = arr[j++];
+        }
+
+        System.arraycopy(temp, 0, arr, left, temp.length);
     }
+
 
 
     /**
@@ -153,11 +178,20 @@ public class ProblemSolutions {
      */
 
     public static boolean asteroidsDestroyed(int mass, int[] asteroids) {
+        Arrays.sort(asteroids);
 
-        // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT()
+        for (int asteroid : asteroids) {
+            if (mass >= asteroid) {
+                // Planet absorbs the asteroid
+                mass += asteroid;
+            } else {
+                // Planet can't absorb the asteroid; destruction occurs
+                return false;
+            }
+        }
 
-        return false;
-
+        // All asteroids destroyed successfully
+        return true;
     }
 
 
@@ -191,11 +225,25 @@ public class ProblemSolutions {
      */
 
     public static int numRescueSleds(int[] people, int limit) {
+        // Sort the array to efficiently pair the lightest and heaviest people
+        Arrays.sort(people);
 
-        // YOUR CODE GOES HERE, CONSIDER USING ARRAYS.SORT
+        int left = 0; // Pointer to the lightest person
+        int right = people.length - 1; // Pointer to the heaviest person
+        int sleds = 0; // Counter for sleds used
 
-        return -1;
+        // Loop until all people are assigned to sleds
+        while (left <= right) {
+            // If the lightest and heaviest person can share a sled
+            if (people[left] + people[right] <= limit) {
+                left++; // Move to the next lightest person
+            }
+            // In both cases (paired or alone), the heaviest person is assigned a sled
+            right--; // Move to the next heaviest person
+            sleds++; // Use one sled
+        }
 
+        return sleds;
     }
 
 } // End Class ProblemSolutions
